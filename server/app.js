@@ -8,11 +8,10 @@ const morgan = require('morgan')
 const xss = require('xss-clean')
 const cors = require('cors')
 
-
 const app = express()
 
 app.use(express.json({ limit: '10kb' }))
-app.use(express.urlencoded({ extended: true}))
+app.use(express.urlencoded({ extended: true }))
 
 app.use(helmet())
 app.use(morgan('dev'))
@@ -28,12 +27,12 @@ app.use(limited)
 app.use(mongosanitize())
 app.use(xss())
 
-app.use(cors({
-  origin: '*',
-  methods: 'GET,PUT,POST,DELETE',
-  credentials: true,
-}))
-
-
+app.use(
+  cors({
+    origin: '*',
+    methods: 'GET,PUT,POST,DELETE',
+    credentials: true
+  })
+)
 
 module.exports = app
