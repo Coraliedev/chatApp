@@ -43,7 +43,24 @@ module.exports.getUsers = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       status: 'error',
-      message: 'Échec de la récupération de la liste des utilisateurs'
+      message: 'Internal server error'
+    });
+  }
+}
+
+module.exports.getFriends = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).populate('friends', '-password');
+
+    res.status(200).json({
+      status: 'success',
+      data: user.friends,
+      message: 'Friends retrieved successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Internal server error'
     });
   }
 }
