@@ -44,7 +44,13 @@ const userSchema = new mongoose.Schema({
   },
   socket_id: {
     type: String
-  }
+  },
+  friends: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  ],
 })
 
 // check if password matches the one in the database

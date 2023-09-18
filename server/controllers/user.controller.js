@@ -25,3 +25,29 @@ module.exports.getUserInfo = async (req, res) => {
     })
   }
 }
+
+module.exports.getUsers = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    const userFriends = user.friends;
+
+    // exclude the current user and the friends of the current user
+    const users = await User.find({
+      _id: { $ne: req.userId, $nin: userFriends }
+    }).select('-password');
+
+    res.status(200).json({
+      status: 'success',
+      data: users
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Échec de la récupération de la liste des utilisateurs'
+    });
+  }
+}
+
+
+
+
