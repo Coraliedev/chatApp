@@ -30,15 +30,6 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Password is required'],
     minlength: [6, 'Password must be at least 6 characters long']
   },
-  passwordChangedAt: {
-    type: Date
-  },
-  passwordResetToken: {
-    type: String
-  },
-  passwordResetExpires: {
-    type: Date
-  },
   createdAt: {
     type: Date,
     default: Date.now()
@@ -49,9 +40,16 @@ const userSchema = new mongoose.Schema({
 })
 
 // check if password matches the one in the database
-userSchema.methods.checkPassword = async function(password) {
+userSchema.methods.checkPassword = async function (password) {
   return await bcrypt.compare(password, this.password)
 }
+
+// hash password before saving to database
+userSchema.pre('save', async function (next) {
+  const salt = await bcrypt.genSalt()
+  this.password = await bcrypt.hash(this.password, salt)
+  next()
+})
 
 const User = mongoose.model('User', userSchema)
 module.exports = User
