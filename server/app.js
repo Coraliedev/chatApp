@@ -8,11 +8,13 @@ const morgan = require('morgan')
 const xss = require('xss-clean')
 const cors = require('cors')
 const routes = require('./routes/index')
+const cookieParser = require('cookie-parser')
 
 const app = express()
 
 app.use(express.json({ limit: '10kb' }))
 app.use(express.urlencoded({ extended: true }))
+app.use(cookieParser())
 
 app.use(helmet())
 app.use(morgan('dev'))

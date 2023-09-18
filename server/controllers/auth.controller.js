@@ -1,8 +1,17 @@
 'use strict'
 
 const jwt = require('jsonwebtoken')
+require('dotenv').config('../.env')
 
 const User = require('../models/user.model')
+
+const maxAge = 3 * 24 * 60 * 60 * 1000
+
+const createToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: maxAge
+  })
+}
 
 module.exports.login = async (req, res) => {
   const { email, password } = req.body
@@ -34,7 +43,13 @@ module.exports.login = async (req, res) => {
   }
 
   // Create token
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
+  const token = createToken(user._id)
+
+  // send token in a HTTP-only cookie
+  res.cookie('jwt', token, {
+    httpOnly: true,
+    maxAge: maxAge
+  })
 
   res.status(200).json({
     status: 'success',
@@ -65,7 +80,13 @@ module.exports.register = async (req, res) => {
       password
     })
     // create token
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET)
+    const token = createToken(newUser._id)
+
+    // send token in a HTTP-only cookie
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      maxAge: maxAge
+    })
 
     res.status(201).json({
       status: 'success',
