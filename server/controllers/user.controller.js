@@ -1,6 +1,7 @@
 'use strict'
 
 const User = require('../models/user.model')
+const FriendRequest = require('../models/friendRequest.model')
 
 module.exports.getUserInfo = async (req, res) => {
   try {
@@ -57,6 +58,25 @@ module.exports.getFriends = async (req, res) => {
       data: user.friends,
       message: 'Friends retrieved successfully'
     });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Internal server error'
+    });
+  }
+}
+
+module.exports.getFriendRequests = async (req, res) => {
+  try {
+    const requests = await FriendRequest.find({ receiver: req.userId })
+    .populate("sender")
+    .select("_id firstName lastName");
+
+  res.status(200).json({
+    status: "success",
+    data: requests,
+    message: "Requests found successfully!",
+  });
   } catch (error) {
     res.status(500).json({
       status: 'error',
