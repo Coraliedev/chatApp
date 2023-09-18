@@ -1,7 +1,7 @@
 'use strict'
 
 const jwt = require('jsonwebtoken')
-require('dotenv').config('../.env')
+require('dotenv').config('')
 
 const User = require('../models/user.model')
 
@@ -15,47 +15,58 @@ const createToken = (id) => {
 
 module.exports.login = async (req, res) => {
   const { email, password } = req.body
-  if (!email || !password) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Both email and password are required'
+  try {
+    if (!email || !password) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Both email and password are required'
+      })
+    }
+  
+    // Check if user exists
+    const user = await User.findOne({ email: email }).select('+password')
+  
+    if (!user) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Email not found'
+      })
+    }
+  
+    // Check if password is valid
+    const isPasswordValid = await user.checkPassword(password)
+  
+    if (!isPasswordValid) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid password'
+      })
+    }
+  
+    // Create token
+    const token = createToken(user._id)
+  
+    // send token in a HTTP-only cookie
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      maxAge: maxAge
     })
-  }
-
-  // Check if user exists
-  const user = await User.findOne({ email: email }).select('+password')
-
-  if (!user) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Email not found'
+  
+    res.status(200).json({
+      status: 'success',
+      message: 'User logged in successfully',
+      token
     })
-  }
-
-  // Check if password is valid
-  const isPasswordValid = await user.checkPassword(password)
-
-  if (!isPasswordValid) {
-    return res.status(400).json({
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
       status: 'error',
-      message: 'Invalid password'
+      message: 'Internal server error'
     })
+    
   }
-
-  // Create token
-  const token = createToken(user._id)
-
-  // send token in a HTTP-only cookie
-  res.cookie('jwt', token, {
-    httpOnly: true,
-    maxAge: maxAge
-  })
-
-  res.status(200).json({
-    status: 'success',
-    message: 'User logged in successfully',
-    token
-  })
+ 
 }
 
 module.exports.register = async (req, res) => {
@@ -95,9 +106,25 @@ module.exports.register = async (req, res) => {
       token
     })
   } catch (error) {
-    res.status(400).json({
+    console.error(error);
+    res.status(500).json({
       status: 'error',
-      message: error.message
+      message: 'Internal server error'
+    })
+  }
+}
+
+module.exports.logout = (req, res) => {
+  try {
+    res.cookie('jwt', '', { maxAge: 1 })
+    res.status(200).json({
+      status: 'success',
+      message: 'User logged out successfully'
+    })
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Internal server error'
     })
   }
 }
