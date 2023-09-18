@@ -1,6 +1,7 @@
 'use strict'
 
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
 const { isEmail } = require('validator')
 
 const userSchema = new mongoose.Schema({
@@ -46,6 +47,11 @@ const userSchema = new mongoose.Schema({
     type: Date
   }
 })
+
+// check if password matches the one in the database
+userSchema.methods.checkPassword = async function(password) {
+  return await bcrypt.compare(password, this.password)
+}
 
 const User = mongoose.model('User', userSchema)
 module.exports = User

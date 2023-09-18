@@ -7,6 +7,7 @@ const mongosanitize = require('express-mongo-sanitize')
 const morgan = require('morgan')
 const xss = require('xss-clean')
 const cors = require('cors')
+const routes = require('./routes/index')
 
 const app = express()
 
@@ -34,5 +35,8 @@ app.use(
     credentials: true
   })
 )
+
+// Routes
+app.use('/api', routes)
 
 module.exports = app
