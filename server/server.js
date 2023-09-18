@@ -11,8 +11,18 @@ require('dotenv').config()
 
 const http = require('http')
 const mongoose = require('mongoose')
+const { Server } = require('socket.io')
+const User = require('./models/user.model')
 
 const server = http.createServer(app)
+
+// configure socket.io
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  }
+})
 
 const port = process.env.PORT || 8000
 const db = process.env.MONGO_URL
@@ -27,6 +37,25 @@ mongoose
 
 server.listen(port, () => {
   console.log(`App running on port ${port}`)
+})
+
+// Listen for when the client connects via socket.io-client
+io.on('connection', async (socket) => {
+  console.log(JSON.stringify(socket.handshake.query))
+  const user_id = socket.handshake.query['user_id']
+
+  console.log(`User connected ${socket.id}`)
+
+  if (user_id != null && Boolean(user_id)) {
+    try {
+      User.findByIdAndUpdate(user_id, {
+        socket_id: socket.id,
+        status: 'Online'
+      })
+    } catch (e) {
+      console.log(e)
+    }
+  }
 })
 
 process.on('unhandledRejection', (err) => {
