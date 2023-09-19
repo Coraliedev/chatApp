@@ -1,6 +1,7 @@
 'use strict'
 
 const Chat = require('../models/chat.model')
+const User = require('../models/user.model')
 
 function handleFriendEvents(io, socket) {
   socket.on('get_direct_conversations', async ({ user_id }, callback) => {
@@ -43,16 +44,55 @@ function handleFriendEvents(io, socket) {
     }
   })
 
-  socket.on("get_messages", async (data, callback) => {
+  socket.on('get_messages', async (data, callback) => {
     try {
-      const { messages } = await Chat.findById(
-        data.conversation_id
-      ).select("messages");
-      callback(messages);
+      const { messages } = await Chat.findById(data.conversation_id).select('messages')
+      callback(messages)
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  });
+  })
+
+  socket.on('send_message', async (data) => {
+    const { message, conversation_id, from, to, type } = data
+    try {
+      // add message to chat
+      const new_message = await Chat.findByIdAndUpdate(
+        conversation_id,
+        {
+          $push: {
+            messages: {
+              from,
+              to,
+              type,
+              text: message,
+              createdAt: Date.now()
+            }
+          }
+        },
+        { new: true, useFindAndModify: false }
+      )
+
+      const to_user = await User.findById(to)
+      const from_user = await User.findById(from)
+
+      // emit incoming_message -> to user
+      io.to(to_user.socket_id).emit('new_message', {
+        conversation_id,
+        message: new_message
+      })
+
+      // emit outgoing_message -> from user
+      io.to(from_user.socket_id).emit('new_message', {
+        conversation_id,
+        message: new_message
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+
 }
 
 module.exports = { handleFriendEvents }
