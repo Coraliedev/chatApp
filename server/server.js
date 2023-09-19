@@ -14,6 +14,7 @@ const mongoose = require('mongoose')
 const { Server } = require('socket.io')
 const User = require('./models/user.model')
 const friendModule = require('./sockets/friend.socket')
+const chatModule = require('./sockets/chat.socket')
 
 const server = http.createServer(app)
 
@@ -62,6 +63,7 @@ io.on('connection', async (socket) => {
   }
 
   friendModule.handleFriendEvents(io, socket);
+  chatModule.handleChatEvents(io, socket);
 
   socket.on("disconnect", async () => {
     // retrieve the user id of the disconnected user
