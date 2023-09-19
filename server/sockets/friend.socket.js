@@ -1,3 +1,5 @@
+'use strict'
+
 const User = require('../models/user.model')
 const FriendRequest = require('../models/friendRequest.model')
 
