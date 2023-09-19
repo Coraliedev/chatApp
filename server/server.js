@@ -13,6 +13,7 @@ const http = require('http')
 const mongoose = require('mongoose')
 const { Server } = require('socket.io')
 const User = require('./models/user.model')
+const friendModule = require('./sockets/friend.socket')
 
 const server = http.createServer(app)
 
@@ -51,12 +52,36 @@ io.on('connection', async (socket) => {
       User.findByIdAndUpdate(user_id, {
         socket_id: socket.id,
         status: 'Online'
+      }).then(() => {
+        console.log(`User ${user_id} connected`);
+        
       })
     } catch (e) {
       console.log(e)
     }
   }
+
+  friendModule.handleFriendEvents(io, socket);
+
+  socket.on("disconnect", async () => {
+    // retrieve the user id of the disconnected user
+    const user_id = socket.handshake.query['user_id'];
+  
+    // update the user status
+    if (user_id) {
+      try {
+        await User.findByIdAndUpdate(user_id, { status: "Offline" });
+        console.log(`User ${user_id} disconnected`);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  });
 })
+
+
+
+
 
 process.on('unhandledRejection', (err) => {
   console.log(err)
