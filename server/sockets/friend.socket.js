@@ -25,6 +25,32 @@ function handleFriendEvents(io, socket) {
       console.log(error);
     }
   })
+
+  socket.on("accept_friend_request", async (data) => {
+    const request_doc = await FriendRequest.findById(data.request_id);
+
+    const sender = await User.findById(request_doc.sender);
+    const receiver = await User.findById(request_doc.receiver);
+
+    // add friend to user 
+    sender.push('friends', request_doc.receiver);
+    receiver.push('friends', request_doc.sender);
+
+    
+    await receiver.save({ new: true, validateModifiedOnly: true });
+    await sender.save({ new: true, validateModifiedOnly: true });
+
+   // delete friend request
+    await FriendRequest.findByIdAndDelete(data.request_id);
+
+    // emit friend request accepted
+    io.to(sender.socket_id).emit("request_accepted", {
+      message: "Friend Request Accepted",
+    });
+    io.to(receiver.socket_id).emit("request_accepted", {
+      message: "Friend Request Accepted",
+    });
+  })
   
 }
 
