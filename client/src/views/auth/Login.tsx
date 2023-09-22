@@ -1,103 +1,31 @@
 import React from "react";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import {
-  Avatar,
-  Box,
-  Button,
-  Checkbox,
-  Container,
-  FormControlLabel,
-  TextField,
-  Link,
-  Typography,
-} from "@mui/material";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
-const validationSchema = Yup.object({
-  email: Yup.string().email("Invalid email address").required("Email is required"),
-  password: Yup.string().required("Password is required").min(6, "Password must be at least 6 characters"),
-});
+import {
+  Stack,
+  Container,
+} from "@mui/material";
+import LoginForm from "../../components/auth/LoginForm";
+
+
 
 const Login: React.FC = () => {
-  const formik = useFormik({
-    initialValues: {
-      email: "",
-      password: "",
-    },
-    validationSchema,
-    onSubmit: handleSubmit,
-  });
 
-  function handleSubmit(values: any) {
-    console.log("Form data", values);
-  }
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Avatar sx={{ m: 1, bgcolor: "info.main" }}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Sign in
-        </Typography>
-        <form onSubmit={formik.handleSubmit}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            autoFocus
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            error={formik.touched.email && Boolean(formik.errors.email)}
-            helperText={formik.touched.email && formik.errors.email}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            value={formik.values.password}
-            onChange={formik.handleChange}
-            error={formik.touched.password && Boolean(formik.errors.password)}
-            helperText={formik.touched.password && formik.errors.password}
-          />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+    <>
+      <Container sx={{ mt: 5 }} maxWidth="sm">
+        <Stack spacing={5}>
+          <Stack
+            sx={{ width: "100%" }}
+            direction="column"
+            alignItems={"center"}
           >
-            Sign In
-          </Button>
-          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-            <Link href="/register" variant="body2">
-              {"Don't have an account? Sign Up"}
-            </Link>
-          </Box>
-        </form>
-      </Box>
-    </Container>
+            <img style={{ height: 120, width: 120 }} src="/logo.png" alt="Logo" />
+          </Stack>
+        </Stack>
+      </Container>
+      <LoginForm />
+    </>
   );
 };
 
