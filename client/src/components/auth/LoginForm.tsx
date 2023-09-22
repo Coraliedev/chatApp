@@ -11,8 +11,27 @@ import {
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import LoginValuesModel from "../../models/LoginValuesModel";
+import React, { useEffect } from "react";
 
 const LoginForm: React.FC = () => {
+  const [userId, setUserId] = React.useState("");
+  const [token, setToken] = React.useState("");
+
+  const getUser = () => {
+    if (token) {
+      fetch("http://localhost:3000/api/users/users", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          credentials: "same-origin"
+        }
+      }
+      ).then((res) => res.json()).then((data) => {
+        console.log(data);
+      })
+    }
+  }
+
 
   const validationSchema = Yup.object({
     email: Yup.string().email("Invalid email address").required("Email is required"),
@@ -31,6 +50,19 @@ const LoginForm: React.FC = () => {
 
   function handleSubmit(values: LoginValuesModel) {
     console.log("Form data", values);
+    fetch("http://localhost:3000/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data.data._id);
+        setUserId(data.data._id);
+        setToken(data.token);
+      })
   }
   return (
     <Container component="main" maxWidth="xs">
@@ -94,6 +126,7 @@ const LoginForm: React.FC = () => {
             </Link>
           </Box>
         </form>
+        <button onClick={getUser}>getUserrs</button>
       </Box>
     </Container>
   )
