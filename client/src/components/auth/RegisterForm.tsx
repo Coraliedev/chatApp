@@ -10,9 +10,14 @@ import {
   Typography,
 } from "@mui/material";
 import RegisterValuesModel from "../../models/RegisterValuesModel";
+import Message from "./Message";
+import { useState } from "react";
 
 
 const RegisterForm: React.FC = () => {
+
+  const [message, setMessage] = useState<string | null>(null);
+  const [messageSeverity, setMessageSeverity] = useState<"success" | "error" | "info">("info");
 
   const validationSchema = Yup.object({
     firstName: Yup.string().required("First Name is required"),
@@ -37,6 +42,7 @@ const RegisterForm: React.FC = () => {
     console.log("Form data", values);
     fetch("http://localhost:3000/api/auth/register", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
@@ -44,7 +50,18 @@ const RegisterForm: React.FC = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
+        if (data.status === "success") {
+          console.log(data);
+          setMessage(data.message);
+          setMessageSeverity("success");
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 2000);
+        }
+        else {
+          setMessage(data.message);
+          setMessageSeverity("error");
+        }
       })
   }
 
@@ -61,6 +78,7 @@ const RegisterForm: React.FC = () => {
         <Typography component="h1" variant="h5" >
           Sign up
         </Typography>
+        <Message message={message} severity={messageSeverity} />
         <form onSubmit={formik.handleSubmit}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
