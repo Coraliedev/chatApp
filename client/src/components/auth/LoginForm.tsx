@@ -11,26 +11,22 @@ import {
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import LoginValuesModel from "../../models/LoginValuesModel";
-import React, { useEffect } from "react";
+import React from "react";
 
 const LoginForm: React.FC = () => {
-  const [userId, setUserId] = React.useState("");
-  const [token, setToken] = React.useState("");
 
   const getUser = () => {
-    if (token) {
-      fetch("http://localhost:3000/api/users/users", {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          credentials: "same-origin",
-        }
+    fetch("http://localhost:3000/api/users/users", {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        credentials: "same-origin",
       }
-      ).then((res) => res.json()).then((data) => {
-        console.log(data);
-      })
     }
+    ).then((res) => res.json()).then((data) => {
+      console.log(data);
+    })
   }
 
 
@@ -61,9 +57,10 @@ const LoginForm: React.FC = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data.data._id);
-        setUserId(data.data._id);
-        setToken(data.token);
+        console.log(data);
+      }).then(() => {
+        // rediriger à la page d'accueil
+        window.location.href = "/"
       })
   }
   return (

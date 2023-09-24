@@ -48,7 +48,7 @@ module.exports.login = async (req, res) => {
   
     // send token in a HTTP-only cookie
     res.cookie('jwt', token, {
-      httpOnly: true,
+      httpOnly: false,
       maxAge: maxAge,
       secure: true,  
       sameSite: 'none' 
@@ -98,7 +98,7 @@ module.exports.register = async (req, res) => {
 
     // send token in a HTTP-only cookie
     res.cookie('jwt', token, {
-      httpOnly: true,
+      httpOnly: false,
       maxAge: maxAge,
       secure: true,  
       sameSite: 'none' 
