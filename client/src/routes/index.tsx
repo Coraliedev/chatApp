@@ -8,6 +8,7 @@ import {
 import Login from "../views/auth/Login";
 import Register from "../views/auth/Register";
 import ChatDashboard from "../views/ChatDashboard";
+import NotFound from "../views/404";
 
 const AppRouter: React.FC = () => {
   // Check if the 'jwt' cookie exists
@@ -23,6 +24,7 @@ const AppRouter: React.FC = () => {
           path="/"
           element={jwtCookie ? <ChatDashboard /> : <Navigate to="/login" />}
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

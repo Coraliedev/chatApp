@@ -28,7 +28,6 @@ const LoginForm: React.FC = () => {
     initialValues: {
       email: "",
       password: "",
-      rememberMe: false,
     },
     validationSchema,
     onSubmit: handleSubmit,
@@ -101,12 +100,6 @@ const LoginForm: React.FC = () => {
             onChange={formik.handleChange}
             error={formik.touched.password && Boolean(formik.errors.password)}
             helperText={formik.touched.password && formik.errors.password}
-          />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" name="rememberMe"
-              checked={formik.values.rememberMe}
-              onChange={formik.handleChange} />}
-            label="Remember me"
           />
           <Button
             type="submit"
