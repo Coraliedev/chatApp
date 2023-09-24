@@ -11,24 +11,13 @@ import {
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import LoginValuesModel from "../../models/LoginValuesModel";
-import React from "react";
+import React, { useState } from "react";
+import Message from "./Message";
 
 const LoginForm: React.FC = () => {
 
-  const getUser = () => {
-    fetch("http://localhost:3000/api/users/users", {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        credentials: "same-origin",
-      }
-    }
-    ).then((res) => res.json()).then((data) => {
-      console.log(data);
-    })
-  }
-
+  const [message, setMessage] = useState<string | null>(null);
+  const [messageSeverity, setMessageSeverity] = useState<"success" | "error" | "info">("info");
 
   const validationSchema = Yup.object({
     email: Yup.string().email("Invalid email address").required("Email is required"),
@@ -46,7 +35,6 @@ const LoginForm: React.FC = () => {
   });
 
   function handleSubmit(values: LoginValuesModel) {
-    console.log("Form data", values);
     fetch("http://localhost:3000/api/auth/login", {
       method: "POST",
       credentials: "include",
@@ -57,10 +45,18 @@ const LoginForm: React.FC = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
-      }).then(() => {
-        // rediriger à la page d'accueil
-        window.location.href = "/"
+        if (data.status === "success") {
+          console.log(data);
+          setMessage(data.message);
+          setMessageSeverity("success");
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 2000);
+        }
+        else {
+          setMessage(data.message);
+          setMessageSeverity("error");
+        }
       })
   }
   return (
@@ -76,6 +72,7 @@ const LoginForm: React.FC = () => {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
+        <Message message={message} severity={messageSeverity} />
         <form onSubmit={formik.handleSubmit}>
           <TextField
             margin="normal"
@@ -125,7 +122,6 @@ const LoginForm: React.FC = () => {
             </Link>
           </Box>
         </form>
-        <button onClick={getUser}>getUserrs</button>
       </Box>
     </Container>
   )
