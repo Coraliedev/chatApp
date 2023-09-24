@@ -21,9 +21,10 @@ const LoginForm: React.FC = () => {
     if (token) {
       fetch("http://localhost:3000/api/users/users", {
         method: "GET",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          credentials: "same-origin"
+          credentials: "same-origin",
         }
       }
       ).then((res) => res.json()).then((data) => {
@@ -52,6 +53,7 @@ const LoginForm: React.FC = () => {
     console.log("Form data", values);
     fetch("http://localhost:3000/api/auth/login", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },

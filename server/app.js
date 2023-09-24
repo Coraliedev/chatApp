@@ -32,11 +32,13 @@ app.use(xss())
 
 app.use(
   cors({
-    origin: '*',
+    origin: 'http://localhost:5173', 
     methods: 'GET,PUT,POST,DELETE',
-    credentials: true
+    credentials: true,
+    exposedHeaders: ['SET-COOKIE'] 
   })
 )
+
 
 // Routes
 app.use('/api', routes)
